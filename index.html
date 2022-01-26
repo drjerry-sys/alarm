@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header></header>
+    <main>
+        <div class="wrapper">
+            <div></div>
+            <div class="setting">
+                <h1 class="dsp">Alarm</h1>
+                <div class="a">
+                    <input type="datetime-local" id="dat" default>
+                    <button id="startButton" class="set" onclick="start()">Set Alarm</button>
+                </div>
+                <div>
+                    <p id="display">00:00:00</p>
+                </div>
+                <div>
+                    <h2 id='insert'></h2>
+                    <input id="insertInp" type="number">
+                </div>
+            </div>
+        </div>
+    </main>
+    <footer></footer>
+    <script>
+        let date;
+        let time;
+        let alarmReader;
+        let remainingTime;
+        let answer;
+        let check = true;
+        let forWake = true;
+        let au;
+        const timeReading = ()=> {
+            if (check) {
+                remainingTime/=1000;
+                check = false;
+            }
+            if (remainingTime <= 0) {
+                insertInp.display = 'block';
+                let au = new Audio("we-are-young-fun.mp3")
+                au.play()
+                let num1 = Math.round(Math.random() * 100);
+                let num2 = Math.round(Math.random() * 100);
+                insert.innerHTML = `${num1} + ${num2}`;
+                answer = num1+num2;
+                wakeUp()
+            }else{
+                remainingTime --;
+                let hour = parseInt(remainingTime/3600);
+                let minute = parseInt((remainingTime % 3600)/60);
+                let seconds = parseInt((remainingTime % 3600)%60)
+                display.innerHTML = `${hour}:${minute}:${seconds}`
+            };
+        };
+
+        const start = ()=> {
+            startButton.disabled = true;
+            let dateInp = dat.value;
+            let dateNtime = dateInp.split(dateInp[10]);
+            date = dateNtime[0], time = dateNtime[1];
+            let jdate = new Date();
+            let ddate = new Date(dateInp);
+            remainingTime = ddate.getTime()-jdate.getTime();
+            alarmReader = setInterval(timeReading, 1000);
+        };
+
+        const wakeUp = ()=> {
+            if (forWake) {
+                insertInp.display = 'block';
+                setTimeout(wakeUp, 60000);
+                forWake = false;
+            } else {
+                let val = insertInp.value;
+                if (val == answer) {
+                    startButton.disabled = false;
+                    au.paused()
+                    clearTimeout(alarmReader);
+                } else {
+                    check = true;
+                    remainingTime = 300000;
+                    alarmReader = setInterval(timeReading, 1000);
+                };
+            }
+        }
+    </script>
+</body>
+</html>
